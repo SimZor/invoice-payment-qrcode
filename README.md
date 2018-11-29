@@ -9,5 +9,5 @@ In your console, you can use this app to generate a qr code with information tha
 - pillow
 
 ## Installation
-# Dependencies
+### Dependencies
 pip install qrcode[pil]
