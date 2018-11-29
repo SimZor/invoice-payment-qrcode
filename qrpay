@@ -1,0 +1,140 @@
+#!/usr/local/bin/python3
+
+import sys
+import json
+import qrcode
+
+keys = [
+    {
+        'key_name': 'vat',
+        'real_name': 'VAT amount',
+        'required': True,
+        'type': float,
+    },
+    {
+        'key_name': 'uqr',
+        'real_name': 'uqr',
+        'default': 1,
+        'required': False,
+        'type': int,
+    },
+    {
+        'key_name': 'tp',
+        'real_name': 'tp',
+        'default': 1,
+        'required': False,
+        'type': int,
+    },
+    {
+        'key_name': 'nme',
+        'real_name': 'Company name',
+        'required': True,
+        'type': str,
+    },
+    {
+        'key_name': 'cc',
+        'real_name': 'Country code',
+        'default': 'SE',
+        'required': False,
+        'type': str,
+    },
+    {
+        'key_name': 'cid',
+        'real_name': 'Company Id',
+        'required': True,
+        'type': str,
+    },
+    {
+        'key_name': 'iref',
+        'real_name': 'OCR number',
+        'required': True,
+        'type': str,
+    },
+    {
+        'key_name': 'idt',
+        'real_name': 'Invoice Date (Fakturadatum)',
+        'required': True,
+        'type': str,
+    },
+    {
+        'key_name': 'ddt',
+        'real_name': 'Due date of payment (Sista betalningsdag)',
+        'required': True,
+        'type': str,
+    },
+    {
+        'key_name': 'due',
+        'real_name': 'Amount due (Fakturasumma)',
+        'required': True,
+        'type': float,
+    },
+    {
+        'key_name': 'cur',
+        'real_name': 'Currency (Valuta)',
+        'required': False,
+        'default': 'SEK',
+        'type': str,
+    },
+    {
+        'key_name': 'pt',
+        'real_name': 'Payment type (Betalningstyp)',
+        'required': False,
+        'default': 'BG',
+        'type': str,
+    },
+    {
+        'key_name': 'acc',
+        'real_name': 'Account number to receive payment (Bankgironummer eller \
+                kontonummer)',
+        'required': True,
+        'type': str,
+    },
+    {
+        'key_name': 'adr',
+        'real_name': 'Postal Number and Postal Town (Postnummer och Postort)',
+        'required': True,
+        'type': str,
+    },
+]
+
+qr_payload = {}
+
+
+# Prompt user to input some value
+# and then get input from the user
+def prompt_get_input(s):
+    sys.stdout.write(s)
+    return input()
+
+
+# Loop through array with specifications
+# of what is required by the bank apps
+for key_dict in keys:
+    # Default string
+    s = f'{key_dict["real_name"]}: '
+
+    # If required print difference string
+    if not key_dict['required']:
+        s = f'{key_dict["real_name"]} ({key_dict["default"]}): '
+
+    i = ''
+    required = key_dict['required']
+    while (not i and required):
+        i = prompt_get_input(s)
+
+    if not i and not required:
+        i = key_dict['default']
+
+    t = key_dict['type']
+    if not isinstance(i, t):
+        i = t(i)
+
+    key = key_dict['key_name']
+    qr_payload[key] = i
+
+# Dump JSON out of the qr_payload dict
+json_payload = json.dumps(qr_payload, ensure_ascii=False)
+
+# Create QR image and show it
+img = qrcode.make(json_payload)
+img.show()
